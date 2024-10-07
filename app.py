@@ -42,10 +42,6 @@ def main():
     # Salvar as chaves selecionadas em uma lista
     lista_chaves = chaves_selecionadas
 
-    # Exibir a lista final (opcional)
-    st.write("Lista final de chaves:")
-    st.write(lista_chaves)
-
 # Executa o aplicativo
 if __name__ == '__main__':
     main()
