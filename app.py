@@ -45,6 +45,13 @@ def main():
     # Exibir a cota selecionada
     st.write(f"Cota selecionada: {cota}")
 
+    lista_chaves = chaves_selecionadas
+
+    lista_pracas = df[df['chave_produto'].isin(lista_chaves)]['praca'].to_list()
+
+    texto_pracas = ', '.join(lista_pracas)
+    st.write(f"Praças presentes: {texto_pracas}")
+
 # Executa o aplicativo
 if __name__ == '__main__':
     main()
