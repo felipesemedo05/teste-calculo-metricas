@@ -32,15 +32,14 @@ def main():
     # Caixa de seleção múltipla com todas as opções de 'chave_produto', filtrável conforme o usuário digita
     chaves_selecionadas = st.multiselect("Buscar chaves de produto:", df['chave_produto'].unique())
 
+    lista_chaves = chaves_selecionadas
+
     # Exibir as chaves selecionadas
     if chaves_selecionadas:
         st.write("Chaves selecionadas:")
-        st.write(chaves_selecionadas)
+        st.write(lista_chaves)
     else:
         st.write("Nenhuma chave selecionada.")
-
-    # Salvar as chaves selecionadas em uma lista
-    lista_chaves = chaves_selecionadas
 
 # Executa o aplicativo
 if __name__ == '__main__':
