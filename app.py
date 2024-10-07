@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import pickle
 
 # Função principal
 def main():
@@ -12,31 +13,26 @@ def main():
     except FileNotFoundError:
         st.error("Erro: O arquivo 'tabela_metricas_produtos.csv' não foi encontrado.")
         return
-
+    
+    try:
+        with open('parametrosPracas.pkl', 'rb') as file:
+            params = pickle.load(file)
+    except FileNotFoundError:
+        st.error("Erro: O arquivo 'parametrosPracas.pkl' não foi encontrado.")
+        return
     # Verificação se a coluna 'chave_produto' existe no DataFrame
     if 'chave_produto' not in df.columns:
         st.error("Erro: A coluna 'chave_produto' não foi encontrada no arquivo.")
         return
 
-    # Campo para inserção de texto (busca)
-    st.write("Digite a chave do produto:")
-    
-    # Caixa de texto para pesquisa
-    chave_input = st.text_input("Buscar chave do produto:")
+    # Exibir um campo de seleção (com filtro) para as chaves do produto
+    st.write("Selecione ou digite a chave do produto:")
 
-    # Filtrar as opções conforme o texto é digitado
-    if chave_input:
-        # Mostrar somente as chaves que contêm o texto inserido
-        opcoes_filtradas = df[df['chave_produto'].str.contains(chave_input, case=False, na=False)]
-        
-        if not opcoes_filtradas.empty:
-            # Exibir as chaves filtradas
-            st.write("Opções encontradas:")
-            st.dataframe(opcoes_filtradas[['chave_produto']])
-        else:
-            st.write("Nenhuma chave encontrada.")
-    else:
-        st.write("Insira uma chave_produto para calcular a métrica.")
+    # Caixa de seleção com todas as opções de 'chave_produto', filtrável conforme o usuário digita
+    chave_selecionada = st.selectbox("Buscar chave do produto:", df['chave_produto'].unique())
+
+    # Mostrar a chave selecionada
+    st.write(f"Chave selecionada: {chave_selecionada}")
 
 # Executa o aplicativo
 if __name__ == '__main__':
