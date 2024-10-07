@@ -47,7 +47,7 @@ def main():
 
     lista_chaves = chaves_selecionadas
 
-    lista_pracas = df[df['chave_produto'].isin(lista_chaves)]['praca'].to_list()
+    lista_pracas = df[df['chave_produto'].isin(lista_chaves)]['praca'].unique().to_list()
 
     texto_pracas = ', '.join(lista_pracas)
     st.write(f"Praças presentes: {texto_pracas}")
