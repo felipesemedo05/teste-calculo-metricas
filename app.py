@@ -43,11 +43,10 @@ def main():
     # Exibir as chaves selecionadas
     if chaves_selecionadas:
         texto_chaves = ', '.join(chaves_selecionadas)
-        st.write("Chaves selecionadas:")
-        st.write(texto_chaves)
+        st.write(f"Chaves selecionadas: {texto_chaves}")
     else:
         st.write("Nenhuma chave selecionada.")
-        
+
     # Exibir o período
     st.write(f"Período inserido: {periodo}")
 
