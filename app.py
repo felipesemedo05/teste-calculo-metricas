@@ -34,6 +34,12 @@ def main():
 
     lista_chaves = chaves_selecionadas
 
+    # Campo de entrada de texto para o período
+    periodo = st.text_input("Digite o período:")
+
+    # Caixa de seleção para a cota
+    cota = st.selectbox("Selecione a cota:", ['0.5', '1.0', '2.0'])
+
     # Exibir as chaves selecionadas
     if chaves_selecionadas:
         texto_chaves = ', '.join(chaves_selecionadas)
@@ -41,6 +47,12 @@ def main():
         st.write(texto_chaves)
     else:
         st.write("Nenhuma chave selecionada.")
+        
+    # Exibir o período
+    st.write(f"Período inserido: {periodo}")
+
+    # Exibir a cota selecionada
+    st.write(f"Cota selecionada: {cota}")
 
 # Executa o aplicativo
 if __name__ == '__main__':
