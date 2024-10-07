@@ -36,8 +36,9 @@ def main():
 
     # Exibir as chaves selecionadas
     if chaves_selecionadas:
+        texto_chaves = ', '.join(chaves_selecionadas)
         st.write("Chaves selecionadas:")
-        st.write(lista_chaves)
+        st.write(texto_chaves)
     else:
         st.write("Nenhuma chave selecionada.")
 
