@@ -32,8 +32,6 @@ def main():
     # Caixa de seleção múltipla com todas as opções de 'chave_produto', filtrável conforme o usuário digita
     chaves_selecionadas = st.multiselect("Buscar chaves de produto:", df['chave_produto'].unique())
 
-    lista_chaves = chaves_selecionadas
-
     # Campo de entrada de texto para o período
     periodo = st.text_input("Digite o período:")
 
@@ -41,11 +39,8 @@ def main():
     cota = st.selectbox("Selecione a cota:", ['0.5', '1.0', '2.0'])
 
     # Exibir as chaves selecionadas
-    if chaves_selecionadas:
-        texto_chaves = ', '.join(chaves_selecionadas)
-        st.write(f"Chaves selecionadas: {texto_chaves}")
-    else:
-        st.write("Nenhuma chave selecionada.")
+    texto_chaves = ', '.join(chaves_selecionadas)
+    st.write(f"Chaves selecionadas: {texto_chaves}")
 
     # Exibir o período
     st.write(f"Período inserido: {periodo}")
