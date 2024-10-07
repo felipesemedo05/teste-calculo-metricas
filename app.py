@@ -26,9 +26,6 @@ def main():
         st.error("Erro: A coluna 'chave_produto' não foi encontrada no arquivo.")
         return
 
-    # Exibir um campo de seleção múltipla (com filtro) para as chaves do produto
-    st.write("Selecione ou digite as chaves de produto:")
-
     # Caixa de seleção múltipla com todas as opções de 'chave_produto', filtrável conforme o usuário digita
     chaves_selecionadas = st.multiselect("Buscar chaves de produto:", df['chave_produto'].unique())
 
