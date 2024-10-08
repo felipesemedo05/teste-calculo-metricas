@@ -5,7 +5,7 @@ import pickle
 # Função principal
 def main():
     # Título do aplicativo
-    st.title("Cálculo Métricas Teste")
+    st.title("Cálculo Métricas Teste a")
 
     # Leitura do arquivo CSV
     try:
@@ -41,7 +41,7 @@ def main():
             # Exibir os detalhes do produto com o maior alcance
             st.write(f"Produto com maior alcance: {maior_alcance['chave_produto']}")
             st.write(f"Alcance: {maior_alcance['alcance']}")
-            
+
     # Campo de entrada de texto para o período
     periodo = st.text_input("Digite o período:")
 
