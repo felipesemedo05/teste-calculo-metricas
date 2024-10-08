@@ -42,6 +42,23 @@ def main():
             st.write(f"Produto com maior alcance: {maior_alcance['chave_produto']}")
             st.write(f"Alcance: {maior_alcance['alcance']}")
 
+                        # Exibir os detalhes do produto com o maior alcance
+            st.write(f"Produto com maior alcance: {maior_alcance['chave_produto']}")
+            st.write(f"Alcance: {maior_alcance['alcance']}")
+
+            # Exibir os pontos do produto com o maior alcance
+            st.write(f"Pontos do produto com maior alcance: {maior_alcance['pontos']}")
+            
+            # Somar os pontos de todos os produtos selecionados
+            total_pontos = df_filtrado['pontos'].sum()
+
+            # Exibir a soma dos pontos
+            st.write(f"Soma dos pontos dos produtos selecionados: {total_pontos}")
+        else:
+            st.write("Nenhuma chave foi encontrada após a filtragem.")
+    else:
+        st.write("Nenhuma chave selecionada.")
+        
     # Campo de entrada de texto para o período
     periodo = st.text_input("Digite o período:")
 
