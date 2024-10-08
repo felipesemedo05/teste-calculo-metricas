@@ -29,6 +29,19 @@ def main():
     # Caixa de seleção múltipla com todas as opções de 'chave_produto', filtrável conforme o usuário digita
     chaves_selecionadas = st.multiselect("Buscar chaves de produto:", df['chave_produto'].unique())
 
+    # Exibir as chaves selecionadas, o período e a cota
+    if chaves_selecionadas:
+        # Filtrar o DataFrame para conter apenas as chaves selecionadas
+        df_filtrado = df[df['chave_produto'].isin(chaves_selecionadas)]
+
+        if not df_filtrado.empty:
+            # Encontrar a linha com o maior valor de 'alcance'
+            maior_alcance = df_filtrado.loc[df_filtrado['alcance'].idxmax()]
+
+            # Exibir os detalhes do produto com o maior alcance
+            st.write(f"Produto com maior alcance: {maior_alcance['chave_produto']}")
+            st.write(f"Alcance: {maior_alcance['alcance']}")
+            
     # Campo de entrada de texto para o período
     periodo = st.text_input("Digite o período:")
 
