@@ -96,18 +96,25 @@ def send_request():
     response = requests.post(url_api_ooh, headers=headers_ooh, json=json_data_ooh, verify=False)
     return response
 
-## Inicializa o estado se não estiver definido
+# Inicializa o estado se não estiver definido
 if 'status' not in st.session_state:
     st.session_state.status = "Parado"  # Status inicial
-
-# Iniciar requisição
-if st.button("Enviar Requisição"):
-    if st.session_state.status == "Parado":  # Verifica se está parado # Define o estado de carregamento
-        st.session_state.response = None  # Limpa a resposta anterior
-        st.session_state.status = "Rodando"  # Atualiza o status para "Rodando"
+    st.session_state.response = None  # Resposta inicial
 
 # Exibir o status abaixo do botão
 st.write(f"Status: {st.session_state.status}")
+
+# Iniciar requisição
+if st.button("Enviar Requisição"):
+    if st.session_state.status == "Parado":  # Verifica se está parado
+        st.session_state.response = None  # Limpa a resposta anterior
+        st.session_state.status = "Rodando"  # Atualiza o status para "Rodando"
+        
+        # Enviar a requisição e atualizar a resposta
+        st.session_state.response = send_request()
+        
+        # Atualiza o status para "Finalizado"
+        st.session_state.status = "Finalizado"
 
 # Verificando a resposta após a requisição
 if st.session_state.response is not None:
