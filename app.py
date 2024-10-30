@@ -94,8 +94,12 @@ def send_request():
     }
 
     # Enviando a requisição
-    response = requests.post(url_api_ooh, headers=headers_ooh, json=json_data_ooh, verify=False)
-    return response
+    try:
+        response = requests.post(url_api_ooh, headers=headers_ooh, json=json_data_ooh, verify=False)
+        return response
+    except Exception as e:
+        st.error(f"Erro ao enviar requisição: {e}")
+        return None
 
 # Função para gerenciar a thread da requisição
 def run_request():
