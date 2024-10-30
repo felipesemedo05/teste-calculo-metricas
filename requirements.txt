@@ -1,13 +1,8 @@
 pandas
-datetime
-google.auth.transport.requests
-google.oauth2.id_token
-google.oauth2.service_account
-qdm
-json
-time
+google-auth
+tqdm
 numpy
 requests
 certifi
 urllib3
-streamlit as st
+streamlit
