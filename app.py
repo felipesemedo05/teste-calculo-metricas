@@ -11,14 +11,31 @@ import urllib3
 # Desabilitar avisos de certificado
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# Função para obter o token de autenticação do Google
-def get_id_token(service_account_info, url):
-    credentials = google.oauth2.service_account.Credentials.from_service_account_info(
-        service_account_info
-    )
-    auth_request = google.auth.transport.requests.Request()
-    id_token = google.oauth2.id_token.fetch_id_token(auth_request, url)
-    return id_token
+def get_id_token(service_account_info, audience):
+    """
+    Obtém um ID token usando a conta de serviço para autenticação com uma Cloud Function.
+
+    Args:
+    - service_account_info (str): Conteúdo JSON da chave da conta de serviço.
+    - audience (str): O público-alvo, geralmente a URL da Cloud Function.
+
+    Returns:
+    - str: O ID token.
+    """
+    try:
+        # Carregar credenciais da conta de serviço diretamente do conteúdo JSON
+        #service_account_info = json.loads(service_account_info)
+        credentials = google.oauth2.service_account.IDTokenCredentials.from_service_account_info(service_account_info, target_audience=audience)
+        print("Service account credentials loaded successfully.")
+        
+        auth_request = google.auth.transport.requests.Request()
+        credentials.refresh(auth_request)
+        print("ID token refreshed successfully.")
+        
+        return credentials.token
+    except (google.auth.exceptions.GoogleAuthError, json.JSONDecodeError) as e:
+        print(f"Error fetching ID token: {e}")
+        return None
 
 # Configuração do Streamlit
 st.title("Aplicativo de Integração com API")
@@ -26,17 +43,6 @@ st.title("Aplicativo de Integração com API")
 # Entrada de dados para as credenciais do serviço
 st.sidebar.header("Configurações de Credenciais")
 
-# # Coletando dados de entrada do usuário no Streamlit
-# project_id = st.sidebar.text_input("ID do Projeto")
-# private_key_id = st.sidebar.text_input("ID da Chave Privada")
-# private_key = st.sidebar.text_area("Chave Privada")
-# client_email = st.sidebar.text_input("Email do Cliente")
-# client_id = st.sidebar.text_input("ID do Cliente")
-# auth_uri = st.sidebar.text_input("URI de Autenticação")
-# token_uri = st.sidebar.text_input("URI do Token")
-# auth_provider_x509_cert_url = st.sidebar.text_input("URL do Certificado do Provedor de Autenticação")
-# client_x509_cert_url = st.sidebar.text_input("URL do Certificado do Cliente")
-# universe_domain = st.sidebar.text_input("Domínio do Universo")
 url_api_ooh = st.secrets['url_api_ooh']
 url_api_OnD = st.secrets['url_api_OnD']
 
