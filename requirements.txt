@@ -3,7 +3,6 @@ google-auth
 tqdm
 numpy
 requests
-time
 tqdm
 certifi
 urllib3
