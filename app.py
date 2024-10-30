@@ -57,10 +57,9 @@ service_account_info = {
 
 # Inputs para a requisição da API
 st.sidebar.header("Configurações da Requisição")
-map_id = st.sidebar.text_input("ID do Mapa", "Mub_Carnaval!")
+map_name = st.sidebar.number_input("Nome do Mapa", min_value=0, value=1)
 start_date = st.sidebar.date_input("Data de Início", datetime(2024, 5, 7))
 end_date = st.sidebar.date_input("Data de Fim", datetime(2024, 5, 27))
-map_name = st.sidebar.number_input("Nome do Mapa", min_value=0, value=1)
 force = st.sidebar.number_input("Força", min_value=0, value=0)
 csv = st.sidebar.number_input("CSV", min_value=0, value=0)
 
@@ -77,10 +76,9 @@ def send_request():
 
     # Dados a serem enviados na requisição POST
     json_data_ooh = {
-        "map_id": map_id,
+        "map_name": map_name,
         "start_date": start_date.strftime('%Y-%m-%d'),
         "end_date": end_date.strftime('%Y-%m-%d'),
-        "map_name": map_name,
         "force": force,
         "csv": csv
     }
