@@ -61,7 +61,7 @@ st.sidebar.header("Configurações da Requisição")
 map_name = st.sidebar.text_input("Nome do Mapa")
 start_date = st.sidebar.date_input("Data de Início", datetime(2024, 5, 7))
 end_date = st.sidebar.date_input("Data de Fim", datetime(2024, 5, 27))
-force = st.sidebar.number_input("Força", min_value=0, value=0)
+force = st.sidebar.number_input("Force", min_value=0, value=0)
 csv = st.sidebar.number_input("CSV", min_value=0, value=0)
 
 # def get_id_token(service_account_info, url):
@@ -70,7 +70,6 @@ csv = st.sidebar.number_input("CSV", min_value=0, value=0)
 #     id_token = google.oauth2.id_token.fetch_id_token(auth_request, url)
 #     return id_token
 
-st.write(service_account_info)
 
 # Função para fazer a requisição
 def send_request():
