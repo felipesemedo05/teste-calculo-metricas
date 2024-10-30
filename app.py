@@ -84,7 +84,7 @@ def send_request():
 
     # Dados a serem enviados na requisição POST
     json_data_ooh = {
-        "map_name": map_name,
+        "map_id": map_name,
         "start_date": start_date.strftime('%Y-%m-%d'),
         "end_date": end_date.strftime('%Y-%m-%d'),
         "map_name": 1,
