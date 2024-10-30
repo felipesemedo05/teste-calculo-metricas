@@ -2,7 +2,9 @@ import streamlit as st
 import pandas as pd
 import requests
 import json
-from datetime import datetime
+import time
+from tqdm import tqdm
+from datetime import datetime, timedelta
 import google.auth.transport.requests
 import google.oauth2.id_token
 import google.oauth2.service_account
@@ -64,49 +66,49 @@ service_account_info = {
 
 # Inputs para a requisição da API
 st.sidebar.header("Configurações da Requisição")
-map_name = st.sidebar.text_input("Nome do Mapa")
-start_date = st.sidebar.date_input("Data de Início", datetime(2024, 5, 7))
-end_date = st.sidebar.date_input("Data de Fim", datetime(2024, 5, 27))
+mapas = st.sidebar.text_input("Nome do Mapa")
+datas_inicio = st.sidebar.date_input("Data de Início", datetime(2024, 5, 7))
+periodos = st.sidebar.number_input("Período", min_value=0, value=0)
 force = st.sidebar.number_input("Force", min_value=0, value=0)
 csv = st.sidebar.number_input("CSV", min_value=0, value=0)
 
-# def get_id_token(service_account_info, url):
-#     credentials = google.oauth2.service_account.Credentials.from_service_account_info(service_account_info)
-#     auth_request = google.auth.transport.requests.Request()
-#     id_token = google.oauth2.id_token.fetch_id_token(auth_request, url)
-#     return id_token
-
-
 # Função para fazer a requisição
 def send_request():
-    # Obtenção do ID token
-    id_token_ooh = get_id_token(service_account_info, url_api_ooh)
-
-    # Cabeçalho de autenticação
-    headers_ooh = {
-        'Authorization': f'Bearer {id_token_ooh}',
-        'Content-Type': 'application/json'
-    }
-
-    # Dados a serem enviados na requisição POST
-    json_data_ooh = {
-        "map_id": map_name,
-        "start_date": start_date.strftime('%Y-%m-%d'),
-        "end_date": end_date.strftime('%Y-%m-%d'),
-        "map_name": 1,
-        "force": force,
-        "csv": csv
-    }
-
-    # Enviando a requisição
-    response = requests.post(url_api_ooh, headers=headers_ooh, json=json_data_ooh, verify=False)
-    return response
+    resultados = []
+    for m in tqdm(mapas):
+        for p in periodos:
+            for d in datas_inicio:
+                time.sleep(2)
+                d_fim = (datetime.strptime(d, '%Y-%m-%d') + timedelta(days=p-1)).strftime('%Y-%m-%d')
+                json_data_ooh = {
+                    "map_id": m,
+                    "start_date": d,
+                    "end_date": d_fim,
+                    "map_name": 1,
+                    "force": 0,
+                    "csv": 0
+                }
+                # Fazendo a requisição POST
+                response = requests.post(url_api_ooh, headers=headers_ooh, json=json_data_ooh, verify=False)
+                
+                while response.status_code != 200:
+                    time.sleep(10)
+                    id_token_ooh = get_id_token(service_account_info, url_api_ooh)
+                    headers_ooh = {
+                        'Authorization': f'Bearer {id_token_ooh}',
+                        'Content-Type': 'application/json'
+                    }
+                    # Fazendo a requisição POST
+                    response = requests.post(url_api_ooh, headers=headers_ooh, json=json_data_ooh, verify=False)
+                    
+                resultados.append([json_data_ooh, response.json()])
+    return resultados
 
 # Botão para enviar a requisição
 if st.button("Enviar Requisição"):
     response = send_request()
     if response.status_code == 200:
         st.success("Requisição enviada com sucesso!")
-        st.json(response.json())
+        st.write(resultados)
     else:
         st.error(f"Erro {response.status_code}: {response.text}")
