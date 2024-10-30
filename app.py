@@ -101,7 +101,7 @@ def send_request():
 def run_request():
     st.session_state.response = send_request()
     st.session_state.loading = False
-    
+
 # Iniciar requisição
 if 'loading' not in st.session_state:
     st.session_state.loading = False
