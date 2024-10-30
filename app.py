@@ -97,9 +97,9 @@ def send_request():
     return response
 
 # Botão para enviar a requisição
-if st.button("Enviar Requisição"):
-    response = send_request()
+if st.button("Enviar Requisição") and st.write('⭕'):
     st.write('🟢')
+    response = send_request()
     if response.status_code == 200:
         st.success("Requisição enviada com sucesso!")
         st.json(response.json())
