@@ -64,6 +64,14 @@ end_date = st.sidebar.date_input("Data de Fim", datetime(2024, 5, 27))
 force = st.sidebar.number_input("Força", min_value=0, value=0)
 csv = st.sidebar.number_input("CSV", min_value=0, value=0)
 
+st.write({
+        "map_name": map_name,
+        "start_date": start_date.strftime('%Y-%m-%d'),
+        "end_date": end_date.strftime('%Y-%m-%d'),
+        "force": force,
+        "csv": csv
+    })
+
 # Função para fazer a requisição
 def send_request():
     # Obtenção do ID token
