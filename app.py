@@ -113,6 +113,6 @@ if st.button("Enviar Requisição"):
     response = send_request()
     if response.status_code == 200:
         st.success("Requisição enviada com sucesso!")
-        st.dataframe(resultados)
+        st.json(response.json())
     else:
         st.error(f"Erro {response.status_code}: {response.text}")
