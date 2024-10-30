@@ -8,6 +8,7 @@ import google.auth.transport.requests
 import google.oauth2.id_token
 import google.oauth2.service_account
 import urllib3
+import threading
 
 # Desabilitar avisos de certificado
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -67,7 +68,7 @@ service_account_info = {
 st.sidebar.header("Configurações da Requisição")
 map_name = st.sidebar.text_input("Nome do Mapa")
 start_date = st.sidebar.date_input("Data de Início", datetime(2024, 5, 7))
-end_date = st.sidebar.date_input("Data de Fimm", datetime(2024, 5, 27))
+end_date = st.sidebar.date_input("Data de Fim", datetime(2024, 5, 27))
 force = st.sidebar.number_input("Force", min_value=0, value=0)
 csv = st.sidebar.number_input("CSV", min_value=0, value=0)
 
@@ -96,11 +97,33 @@ def send_request():
     response = requests.post(url_api_ooh, headers=headers_ooh, json=json_data_ooh, verify=False)
     return response
 
-# Botão para enviar a requisição
+# Função para gerenciar a thread da requisição
+def run_request():
+    st.session_state.response = send_request()
+    st.session_state.loading = False
+    
+# Iniciar requisição
+if 'loading' not in st.session_state:
+    st.session_state.loading = False
+
 if st.button("Enviar Requisição"):
-    response = send_request()
-    if response.status_code == 200:
+    if not st.session_state.loading:  # Verifica se já não está carregando
+        st.session_state.loading = True  # Define o estado de carregamento
+        st.session_state.response = None  # Limpa a resposta anterior
+
+        # Inicia a requisição em uma thread
+        threading.Thread(target=run_request).start()
+
+# Botão para parar a requisição
+if st.session_state.loading:
+    if st.button("Parar Requisição"):
+        st.session_state.loading = False  # Para o carregamento
+        st.warning("Requisição parada.")
+
+# Verificando a resposta após a requisição
+if st.session_state.response is not None:
+    if st.session_state.response.status_code == 200:
         st.success("Requisição enviada com sucesso!")
-        st.json(response.json())
+        st.json(st.session_state.response.json())
     else:
-        st.error(f"Erro {response.status_code}: {response.text}")
+        st.error(f"Erro {st.session_state.response.status_code}: {st.session_state.response.text}")
