@@ -64,11 +64,13 @@ end_date = st.sidebar.date_input("Data de Fim", datetime(2024, 5, 27))
 force = st.sidebar.number_input("Força", min_value=0, value=0)
 csv = st.sidebar.number_input("CSV", min_value=0, value=0)
 
-def get_id_token(service_account_info, url):
-    credentials = google.oauth2.service_account.Credentials.from_service_account_info(service_account_info)
-    auth_request = google.auth.transport.requests.Request()
-    id_token = google.oauth2.id_token.fetch_id_token(auth_request, url)
-    return id_token
+# def get_id_token(service_account_info, url):
+#     credentials = google.oauth2.service_account.Credentials.from_service_account_info(service_account_info)
+#     auth_request = google.auth.transport.requests.Request()
+#     id_token = google.oauth2.id_token.fetch_id_token(auth_request, url)
+#     return id_token
+
+st.write(service_account_info)
 
 # Função para fazer a requisição
 def send_request():
