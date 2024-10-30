@@ -6,4 +6,3 @@ requests
 certifi
 urllib3
 streamlit
-threading
