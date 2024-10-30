@@ -57,7 +57,7 @@ service_account_info = {
 
 # Inputs para a requisição da API
 st.sidebar.header("Configurações da Requisição")
-map_name = st.sidebar.number_input("Nome do Mapa", min_value=0, value=1)
+map_name = st.sidebar.number_input("Nome do Mapa")
 start_date = st.sidebar.date_input("Data de Início", datetime(2024, 5, 7))
 end_date = st.sidebar.date_input("Data de Fim", datetime(2024, 5, 27))
 force = st.sidebar.number_input("Força", min_value=0, value=0)
