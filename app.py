@@ -52,7 +52,7 @@ service_account_info = {
     "token_uri": st.secrets['token_uri'],
     "auth_provider_x509_cert_url": st.secrets['auth_provider_x509_cert_url'],
     "client_x509_cert_url": st.secrets['client_x509_cert_url'],
-    "universe_domain":st.secrets['universe_domain']
+    "universe_domain": st.secrets['universe_domain']
 }
 
 
@@ -64,13 +64,11 @@ end_date = st.sidebar.date_input("Data de Fim", datetime(2024, 5, 27))
 force = st.sidebar.number_input("Força", min_value=0, value=0)
 csv = st.sidebar.number_input("CSV", min_value=0, value=0)
 
-st.write({
-        "map_name": map_name,
-        "start_date": start_date.strftime('%Y-%m-%d'),
-        "end_date": end_date.strftime('%Y-%m-%d'),
-        "force": force,
-        "csv": csv
-    })
+def get_id_token(service_account_info, url):
+    credentials = google.oauth2.service_account.Credentials.from_service_account_info(service_account_info)
+    auth_request = google.auth.transport.requests.Request()
+    id_token = google.oauth2.id_token.fetch_id_token(auth_request, url)
+    return id_token
 
 # Função para fazer a requisição
 def send_request():
