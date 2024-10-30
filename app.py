@@ -66,8 +66,8 @@ service_account_info = {
 
 # Inputs para a requisição da API
 st.sidebar.header("Configurações da Requisição")
-mapas = st.sidebar.text_input("Nome do Mapa")
-datas_inicio = st.sidebar.date_input("Data de Início", datetime(2024, 5, 7))
+map = st.sidebar.text_input("Nome do Mapa")
+datas = st.sidebar.date_input("Data de Início", datetime(2024, 5, 7))
 periodos = st.sidebar.number_input("Período", min_value=0, value=0)
 force = st.sidebar.number_input("Force", min_value=0, value=0)
 csv = st.sidebar.number_input("CSV", min_value=0, value=0)
@@ -75,6 +75,10 @@ csv = st.sidebar.number_input("CSV", min_value=0, value=0)
 # Função para fazer a requisição
 def send_request():
     resultados = []
+    mapas = []
+    datas_inicio = []
+    datas_inicio.append(datas)
+    mapas.append(map)
     for m in tqdm(mapas):
         for p in periodos:
             for d in datas_inicio:
@@ -109,6 +113,6 @@ if st.button("Enviar Requisição"):
     response = send_request()
     if response.status_code == 200:
         st.success("Requisição enviada com sucesso!")
-        st.write(resultados)
+        st.dataframe(resultados)
     else:
         st.error(f"Erro {response.status_code}: {response.text}")
