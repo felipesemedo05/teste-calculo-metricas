@@ -55,6 +55,8 @@ service_account_info = {
     "universe_domain":st.secrets['universe_domain']
 }
 
+st.write(st.secrets['type'])
+
 # Inputs para a requisição da API
 st.sidebar.header("Configurações da Requisição")
 map_name = st.sidebar.text_input("Nome do Mapa")
