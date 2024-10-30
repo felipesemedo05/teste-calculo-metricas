@@ -106,7 +106,7 @@ def send_request():
                     response = requests.post(url_api_ooh, headers=headers_ooh, json=json_data_ooh, verify=False)
                     
                 resultados.append([json_data_ooh, response.json()])
-    return resultados
+    return response
 
 # Botão para enviar a requisição
 if st.button("Enviar Requisição"):
