@@ -3,7 +3,6 @@ google-auth
 tqdm
 numpy
 requests
-tqdm
 certifi
 urllib3
 streamlit
