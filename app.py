@@ -102,8 +102,7 @@ if 'status' not in st.session_state:
 
 # Iniciar requisição
 if st.button("Enviar Requisição"):
-    if st.session_state.status == "Parado":  # Verifica se está parado
-        st.session_state.loading = True  # Define o estado de carregamento
+    if st.session_state.status == "Parado":  # Verifica se está parado # Define o estado de carregamento
         st.session_state.response = None  # Limpa a resposta anterior
         st.session_state.status = "Rodando"  # Atualiza o status para "Rodando"
 
