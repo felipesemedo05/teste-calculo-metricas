@@ -8,7 +8,6 @@ import google.auth.transport.requests
 import google.oauth2.id_token
 import google.oauth2.service_account
 import urllib3
-import threading
 
 # Desabilitar avisos de certificado
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -94,40 +93,14 @@ def send_request():
     }
 
     # Enviando a requisição
-    try:
-        response = requests.post(url_api_ooh, headers=headers_ooh, json=json_data_ooh, verify=False)
-        return response
-    except Exception as e:
-        st.error(f"Erro ao enviar requisição: {e}")
-        return None
+    response = requests.post(url_api_ooh, headers=headers_ooh, json=json_data_ooh, verify=False)
+    return response
 
-# Função para gerenciar a thread da requisição
-def run_request():
-    st.session_state.response = send_request()
-    st.session_state.loading = False
-
-# Iniciar requisição
-if 'loading' not in st.session_state:
-    st.session_state.loading = False
-
+# Botão para enviar a requisição
 if st.button("Enviar Requisição"):
-    if not st.session_state.loading:  # Verifica se já não está carregando
-        st.session_state.loading = True  # Define o estado de carregamento
-        st.session_state.response = None  # Limpa a resposta anterior
-
-        # Inicia a requisição em uma thread
-        threading.Thread(target=run_request).start()
-
-# Botão para parar a requisição
-if st.session_state.loading:
-    if st.button("Parar Requisição"):
-        st.session_state.loading = False  # Para o carregamento
-        st.warning("Requisição parada.")
-
-# Verificando a resposta após a requisição
-if st.session_state.response is not None:
-    if st.session_state.response.status_code == 200:
+    response = send_request()
+    if response.status_code == 200:
         st.success("Requisição enviada com sucesso!")
-        st.json(st.session_state.response.json())
+        st.json(response.json())
     else:
-        st.error(f"Erro {st.session_state.response.status_code}: {st.session_state.response.text}")
+        st.error(f"Erro {response.status_code}: {response.text}")
