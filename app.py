@@ -97,12 +97,21 @@ def send_request():
     return response
 
 # Botão para enviar a requisição
-st.write('⭕')
+
+# Iniciar requisição
 if st.button("Enviar Requisição"):
-    st.write('🟢')
-    response = send_request()
-    if response.status_code == 200:
+    if st.session_state.status == "Parado":  # Verifica se está parado
+        st.session_state.loading = True  # Define o estado de carregamento
+        st.session_state.response = None  # Limpa a resposta anterior
+        st.session_state.status = "Rodando"  # Atualiza o status para "Rodando"
+
+# Exibir o status abaixo do botão
+st.write(f"Status: {st.session_state.status}")
+
+# Verificando a resposta após a requisição
+if st.session_state.response is not None:
+    if st.session_state.response.status_code == 200:
         st.success("Requisição enviada com sucesso!")
-        st.json(response.json())
+        st.json(st.session_state.response.json())
     else:
-        st.error(f"Erro {response.status_code}: {response.text}")
+        st.error(f"Erro {st.session_state.response.status_code}: {st.session_state.response.text}")
