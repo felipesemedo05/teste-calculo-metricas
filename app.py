@@ -96,7 +96,9 @@ def send_request():
     response = requests.post(url_api_ooh, headers=headers_ooh, json=json_data_ooh, verify=False)
     return response
 
-# Botão para enviar a requisição
+## Inicializa o estado se não estiver definido
+if 'status' not in st.session_state:
+    st.session_state.status = "Parado"  # Status inicial
 
 # Iniciar requisição
 if st.button("Enviar Requisição"):
