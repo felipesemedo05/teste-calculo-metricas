@@ -67,7 +67,7 @@ service_account_info = {
 st.sidebar.header("Configurações da Requisição")
 map_name = st.sidebar.text_input("Nome do Mapa")
 start_date = st.sidebar.date_input("Data de Início")
-periodos = st.sidebar.number_input("Periodo")
+periodos = st.sidebar.number_input("Periodo", min_value=0, value=0)
 force = st.sidebar.number_input("Force", min_value=0, value=0)
 csv = st.sidebar.number_input("CSV", min_value=0, value=0)
 
@@ -81,7 +81,7 @@ def send_request():
         'Authorization': f'Bearer {id_token_ooh}',
         'Content-Type': 'application/json'
     }
-    
+
     d_fim = (datetime.strptime(start_date, '%Y-%m-%d') + timedelta(days=periodos-1)).strftime('%Y-%m-%d')
 
     # Dados a serem enviados na requisição POST
