@@ -72,9 +72,6 @@ periodos = st.sidebar.number_input("Periodo", min_value=0, value=0)
 force = st.sidebar.number_input("Force", min_value=0, value=0, max_value=1)
 csv = st.sidebar.number_input("CSV", min_value=0, value=0, max_value=1)
 d_fim = (datetime.strptime(start_date_str, '%Y-%m-%d') + timedelta(days=periodos-1)).strftime('%Y-%m-%d')
-st.write(start_date)
-st.write(periodos)
-st.write(d_fim)
 # Função para fazer a requisição
 def send_request():
     # Obtenção do ID token
@@ -105,10 +102,15 @@ def send_request():
 if st.button("Enviar Requisição"):
     response = send_request()
     if response.status_code == 200:
+        impactos = response.json()['data']['impressions']['data'][0]['total_trips']
+        alcance = response.json()['data']['unique_devices']['data'][0]['uniques']
+        freq = impactos/alcance
         st.success("Requisição enviada com sucesso!")
         st.header('Impactos')
-        st.write(response.json()['data']['impressions']['data'][0]['total_trips'])
+        st.write(impactos)
         st.header('Alcance')
-        st.write(response.json()['data']['unique_devices']['data'][0]['uniques'])
+        st.write(alcance)
+        st.header('Frequência')
+        st.write(freq)
     else:
         st.error(f"Erro {response.status_code}: {response.text}")
