@@ -68,9 +68,12 @@ st.sidebar.header("Configurações da Requisição")
 map_name = st.sidebar.text_input("Nome do Mapa")
 start_date = st.sidebar.date_input("Data de Início")
 periodos = st.sidebar.number_input("Periodo", min_value=0, value=0)
-force = st.sidebar.number_input("Force", min_value=0, value=0)
-csv = st.sidebar.number_input("CSV", min_value=0, value=0)
-
+force = st.sidebar.number_input("Force", min_value=0, value=0, max_value=1)
+csv = st.sidebar.number_input("CSV", min_value=0, value=0, max_value=1)
+d_fim = (datetime.strptime(start_date, '%Y-%m-%d') + timedelta(days=periodos-1)).strftime('%Y-%m-%d')
+st.write(start_date)
+st.write(periodos)
+st.write(d_fim)
 # Função para fazer a requisição
 def send_request():
     # Obtenção do ID token
@@ -82,7 +85,6 @@ def send_request():
         'Content-Type': 'application/json'
     }
 
-    d_fim = (datetime.strptime(start_date, '%Y-%m-%d') + timedelta(days=periodos-1)).strftime('%Y-%m-%d')
 
     # Dados a serem enviados na requisição POST
     json_data_ooh = {
