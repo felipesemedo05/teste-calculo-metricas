@@ -66,8 +66,9 @@ service_account_info = {
 # Inputs para a requisição da API
 st.sidebar.header("Configurações da Requisição")
 map_name = st.sidebar.text_input("Nome do Mapa")
-start_date = st.sidebar.date_input("Data de Início", datetime(2024, 5, 7))
-end_date = st.sidebar.date_input("Data de Fim", datetime(2024, 5, 27))
+start_date = st.sidebar.date_input("Data de Início")
+periodos = st.sidebar.number_input("Periodo")
+d_fim = (datetime.strptime(start_date, '%Y-%m-%d') + timedelta(days=periodos-1)).strftime('%Y-%m-%d')
 force = st.sidebar.number_input("Force", min_value=0, value=0)
 csv = st.sidebar.number_input("CSV", min_value=0, value=0)
 
@@ -86,7 +87,7 @@ def send_request():
     json_data_ooh = {
         "map_id": map_name,
         "start_date": start_date.strftime('%Y-%m-%d'),
-        "end_date": end_date.strftime('%Y-%m-%d'),
+        "end_date": d_fim.strftime('%Y-%m-%d'),
         "map_name": 1,
         "force": force,
         "csv": csv
@@ -96,30 +97,11 @@ def send_request():
     response = requests.post(url_api_ooh, headers=headers_ooh, json=json_data_ooh, verify=False)
     return response
 
-# Inicializa o estado se não estiver definido
-if 'status' not in st.session_state:
-    st.session_state.status = "Parado"  # Status inicial
-    st.session_state.response = None  # Resposta inicial
-
-# Exibir o status abaixo do botão
-st.write(f"Status: {st.session_state.status}")
-
-# Iniciar requisição
+# Botão para enviar a requisição
 if st.button("Enviar Requisição"):
-    if st.session_state.status == "Parado":  # Verifica se está parado
-        st.session_state.response = None  # Limpa a resposta anterior
-        st.session_state.status = "Rodando"  # Atualiza o status para "Rodando"
-        
-        # Enviar a requisição e atualizar a resposta
-        st.session_state.response = send_request()
-        
-        # Atualiza o status para "Finalizado"
-        st.session_state.status = "Finalizado"
-
-# Verificando a resposta após a requisição
-if st.session_state.response is not None:
-    if st.session_state.response.status_code == 200:
+    response = send_request()
+    if response.status_code == 200:
         st.success("Requisição enviada com sucesso!")
-        st.json(st.session_state.response.json())
+        st.json(response.json())
     else:
-        st.error(f"Erro {st.session_state.response.status_code}: {st.session_state.response.text}")
+        st.error(f"Erro {response.status_code}: {response.text}")
