@@ -88,7 +88,7 @@ def send_request():
     json_data_ooh = {
         "map_id": map_name,
         "start_date": start_date.strftime('%Y-%m-%d'),
-        "end_date": d_fim.strftime('%Y-%m-%d'),
+        "end_date": d_fim,
         "map_name": 1,
         "force": force,
         "csv": csv
