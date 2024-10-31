@@ -106,6 +106,9 @@ if st.button("Enviar Requisição"):
     response = send_request()
     if response.status_code == 200:
         st.success("Requisição enviada com sucesso!")
-        st.json(response.json())
+        st.header('Impactos')
+        st.write(response.json()['data']['impressions']['data'][0]['total_trips'])
+        st.header('Alcance')
+        st.write(response.json()['data']['unique_devices']['data'][0]['uniques'])
     else:
         st.error(f"Erro {response.status_code}: {response.text}")
