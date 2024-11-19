@@ -1,116 +1,129 @@
 import streamlit as st
 import pandas as pd
-import requests
-import json
-from datetime import datetime, timedelta
-from tqdm import tqdm
-import google.auth.transport.requests
-import google.oauth2.id_token
-import google.oauth2.service_account
-import urllib3
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+import time
 
-# Desabilitar avisos de certificado
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+# Configuração inicial do Streamlit
+st.title("Portal Belas Artes - Notas e Faltas")
 
-def get_id_token(service_account_info, audience):
-    """
-    Obtém um ID token usando a conta de serviço para autenticação com uma Cloud Function.
+# Entrada de usuário e senha
+st.sidebar.header("Login")
+usuario = st.sidebar.text_input("Usuário:")
+senha = st.sidebar.text_input("Senha:", type="password")
 
-    Args:
-    - service_account_info (str): Conteúdo JSON da chave da conta de serviço.
-    - audience (str): O público-alvo, geralmente a URL da Cloud Function.
+if st.sidebar.button("Entrar"):
+    # Configuração do Selenium
+    service = Service()
+    options = webdriver.ChromeOptions()
+    driver = webdriver.Chrome(service=service, options=options)
 
-    Returns:
-    - str: O ID token.
-    """
     try:
-        # Carregar credenciais da conta de serviço diretamente do conteúdo JSON
-        #service_account_info = json.loads(service_account_info)
-        credentials = google.oauth2.service_account.IDTokenCredentials.from_service_account_info(service_account_info, target_audience=audience)
-        print("Service account credentials loaded successfully.")
-        
-        auth_request = google.auth.transport.requests.Request()
-        credentials.refresh(auth_request)
-        print("ID token refreshed successfully.")
-        
-        return credentials.token
-    except (google.auth.exceptions.GoogleAuthError, json.JSONDecodeError) as e:
-        print(f"Error fetching ID token: {e}")
-        return None
+        # Acessar o portal
+        url = 'https://portal.belasartes.br/FrameHTML/Web/App/Edu/PortalEducacional/login/'
+        driver.get(url)
+        st.info('Acessando o site...')
+        time.sleep(5)
 
-# Configuração do Streamlit
-st.title("Aplicativo de Integração com API")
+        # Preenchendo os campos de login
+        driver.find_element(By.XPATH, '//*[@id="User"]').send_keys(usuario)
+        driver.find_element(By.XPATH, '//*[@id="Pass"]').send_keys(senha)
+        driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/form/div[4]/input').click()
+        time.sleep(10)
 
-# Entrada de dados para as credenciais do serviço
-st.sidebar.header("Configurações de Credenciais")
+        st.success('Login bem-sucedido!')
 
-url_api_ooh = st.secrets['url_api_ooh']
-url_api_OnD = st.secrets['url_api_OnD']
+        # Acessar notas
+        driver.find_element(By.XPATH, '//*[@id="sidebar-min"]/ul/li[6]').click()
+        time.sleep(2)
+        driver.find_element(By.XPATH, '//*[@id="EDU_PORTAL_ACADEMICO_CENTRALALUNO"]').click()
+        time.sleep(2)
+        driver.find_element(By.XPATH, '//*[@id="EDU_PORTAL_ACADEMICO_CENTRALALUNO_NOTAS"]').click()
+        time.sleep(6)
 
-# Definindo as informações da conta de serviço
-service_account_info = {
-    "type": st.secrets['type'],
-    "project_id": st.secrets['project_id'],
-    "private_key_id": st.secrets['private_key_id'],
-    "private_key": st.secrets['private_key'],
-    "client_email": st.secrets['client_email'],
-    "client_id": st.secrets['client_id'],
-    "auth_uri": st.secrets['auth_uri'],
-    "token_uri": st.secrets['token_uri'],
-    "auth_provider_x509_cert_url": st.secrets['auth_provider_x509_cert_url'],
-    "client_x509_cert_url": st.secrets['client_x509_cert_url'],
-    "universe_domain": st.secrets['universe_domain']
-}
+        st.info('Carregando as notas...')
+        texto = driver.find_elements(By.CLASS_NAME, 'gridRow')
+        aa = [txt.text for txt in texto if txt.text]
 
+        # Processar notas
+        data = [item.strip().split('\n') for item in aa]
+        blocos = []
+        bloco_atual = []
 
-# Inputs para a requisição da API
-st.sidebar.header("Configurações da Requisição")
-map_name = st.sidebar.text_input("Nome do Mapa")
-start_date = st.sidebar.date_input("Data de Início")
-start_date_str = start_date.strftime('%Y-%m-%d')
-periodos = st.sidebar.number_input("Periodo", min_value=0, value=0)
-force = st.sidebar.number_input("Force", min_value=0, value=0, max_value=1)
-csv = st.sidebar.number_input("CSV", min_value=0, value=0, max_value=1)
-d_fim = (datetime.strptime(start_date_str, '%Y-%m-%d') + timedelta(days=periodos-1)).strftime('%Y-%m-%d')
-# Função para fazer a requisição
-def send_request():
-    # Obtenção do ID token
-    id_token_ooh = get_id_token(service_account_info, url_api_ooh)
+        for item in data:
+            if item == ['CENTRO UNIVERSITARIO BELAS ARTES DE SAO PAULO']:
+                if bloco_atual:
+                    blocos.append(bloco_atual)
+                bloco_atual = [item[0]]
+            else:
+                bloco_atual.append(item[0])
 
-    # Cabeçalho de autenticação
-    headers_ooh = {
-        'Authorization': f'Bearer {id_token_ooh}',
-        'Content-Type': 'application/json'
-    }
+        if bloco_atual:
+            blocos.append(bloco_atual)
 
+        df = pd.DataFrame(blocos, columns=['Instituição', 'Código', 'Materia', 'Status', 'Nota', 'Frequência', 'Avaliações'])
+        df = df[['Materia', 'Nota']]
+        df['Nota'] = df['Nota'].apply(lambda x: x.replace('Ver avaliações', '0'))
+        df['Nota'] = df['Nota'].apply(lambda x: float(x.replace(',', '.')) if x.replace(',', '.').replace('.', '').isdigit() else x)
 
-    # Dados a serem enviados na requisição POST
-    json_data_ooh = {
-        "map_id": map_name,
-        "start_date": start_date.strftime('%Y-%m-%d'),
-        "end_date": d_fim,
-        "map_name": 1,
-        "force": force,
-        "csv": csv
-    }
+        # Calculando "Quanto Falta"
+        grade_requirements = {
+            0.0: 0.0, 0.5: 9.5, 1.0: 9.0, 1.5: 9.0, 2.0: 8.5,
+            2.5: 8.0, 3.0: 8.0, 3.5: 7.5, 4.0: 7.0, 4.5: 7.0,
+            5.0: 6.5, 5.5: 6.0, 6.0: 6.0, 6.5: 5.5, 7.0: 5.0,
+            7.5: 5.0, 8.0: 4.5, 8.5: 4.0, 9.0: 4.0, 9.5: 3.5,
+            10.0: 3.0, 8.2: 4.5
+        }
+        df['Quanto Falta'] = [grade_requirements.get(grade, '0') for grade in df['Nota']]
 
-    # Enviando a requisição
-    response = requests.post(url_api_ooh, headers=headers_ooh, json=json_data_ooh, verify=False)
-    return response
+        # Acessar faltas
+        driver.find_element(By.XPATH, '//*[@id="sidebar-min"]/ul/li[6]').click()
+        time.sleep(2)
+        driver.find_element(By.XPATH, '//*[@id="EDU_PORTAL_ACADEMICO_CENTRALALUNO"]').click()
+        time.sleep(2)
+        driver.find_element(By.XPATH, '//*[@id="EDU_PORTAL_ACADEMICO_CENTRALALUNO_FALTAS"]').click()
+        time.sleep(6)
 
-# Botão para enviar a requisição
-if st.button("Enviar Requisição"):
-    response = send_request()
-    if response.status_code == 200:
-        impactos = response.json()['data']['impressions']['data'][0]['total_trips']
-        alcance = response.json()['data']['unique_devices']['data'][0]['uniques']
-        freq = impactos/alcance
-        st.success("Requisição enviada com sucesso!")
-        st.header('Impactos')
-        st.write(impactos)
-        st.header('Alcance')
-        st.write(alcance)
-        st.header('Frequência')
-        st.write(freq)
-    else:
-        st.error(f"Erro {response.status_code}: {response.text}")
+        st.info('Carregando as faltas...')
+        aab = [txt.text for txt in driver.find_elements(By.CLASS_NAME, 'gridRow') if txt.text]
+
+        # Processar faltas
+        rows = []
+        temp_row = []
+
+        for item in aab:
+            temp_row.append(item)
+            if item == "Ver faltas":
+                rows.append(temp_row)
+                temp_row = []
+
+        formatted_rows = []
+        for row in rows:
+            if len(row) == 4:
+                formatted_rows.append([row[0], row[1], row[2], 0, 0, 0, 0, 0, 0, 0, row[3]])
+            else:
+                formatted_rows.append(row[:10])
+
+        columns = ['Instituicao', 'Materia', 'Curso', 'Total_Faltas', 'Faltas_Agosto', 'Faltas_Setembro', 
+                   'Faltas_Outubro', 'Faltas_Novembro', 'Total_Faltas_Possiveis', 'Ver faltas', 'Ver faltas']
+        df2 = pd.DataFrame(formatted_rows, columns=columns)
+        df2 = df2[['Materia', 'Total_Faltas', 'Total_Faltas_Possiveis']]
+
+        # Merge notas e faltas
+        df_final = df.merge(df2, on='Materia')
+
+        # Exibir tabelas
+        st.subheader("Notas")
+        st.dataframe(df)
+
+        st.subheader("Faltas")
+        st.dataframe(df2)
+
+        st.subheader("Resumo Final")
+        st.dataframe(df_final)
+
+    except Exception as e:
+        st.error(f"Ocorreu um erro: {e}")
+    finally:
+        driver.quit()
